@@ -26,6 +26,7 @@ export default function ExpenseApp() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [category, setCategory] = useState<CategoryFilter>("ALL");
   const [month, setMonth] = useState<string | "ALL">("ALL");
@@ -51,6 +52,7 @@ export default function ExpenseApp() {
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    setLoginError("");
 
     // Validate against hardcoded credentials
     if (username === VALID_USERNAME && password === VALID_PASSWORD) {
@@ -58,8 +60,9 @@ export default function ExpenseApp() {
       setIsLoggedIn(true);
       setUsername("");
       setPassword("");
+      setLoginError("");
     } else {
-      alert("Ugyldig brukernavn eller passord");
+      setLoginError("Ugyldig brukernavn eller passord");
     }
   }
 
@@ -175,6 +178,20 @@ export default function ExpenseApp() {
             >
               Logg inn
             </button>
+            {loginError && (
+              <div
+                style={{
+                  padding: "clamp(8px, 2vw, 12px)",
+                  background: "#fee2e2",
+                  color: "#dc2626",
+                  borderRadius: 6,
+                  fontSize: "clamp(13px, 2.5vw, 14px)",
+                  textAlign: "center",
+                }}
+              >
+                {loginError}
+              </div>
+            )}
           </form>
         </div>
       </div>

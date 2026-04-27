@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: famfin
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /var/data
+    disks:
+      - name: famfin-data
+        mountPath: /var/data
+        sizeGB: 1

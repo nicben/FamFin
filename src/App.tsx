@@ -256,12 +256,13 @@ export default function ExpenseApp() {
           gap: 16,
           marginBottom: 24,
           flexWrap: "wrap",
-          "@media (max-width: 768px)": {
-            flexDirection: "column",
-          }
         }}
       >
-        <select value={month} onChange={(e) => setMonth(e.target.value)} style={{ flex: 1, minWidth: 150 }}>
+        <select
+          value={month}
+          onChange={(e) => setMonth(e.target.value)}
+          style={{ flex: 1, minWidth: 150 }}
+        >
           <option value="ALL">Alle måneder</option>
           {months.map((m) => (
             <option key={m} value={m}>
@@ -285,7 +286,11 @@ export default function ExpenseApp() {
             ))}
         </select>
 
-        <select value={party} onChange={(e) => setParty(e.target.value)} style={{ flex: 1, minWidth: 150 }}>
+        <select
+          value={party}
+          onChange={(e) => setParty(e.target.value)}
+          style={{ flex: 1, minWidth: 150 }}
+        >
           <option value="ALL">Alle avsendere/mottakere</option>
           {parties
             .filter((p) => p !== "ALL")
@@ -346,7 +351,13 @@ export default function ExpenseApp() {
           }}
         >
           <thead>
-            <tr style={{ textAlign: "left", color: "#6b7280", fontSize: "clamp(12px, 2.5vw, 13px)" }}>
+            <tr
+              style={{
+                textAlign: "left",
+                color: "#6b7280",
+                fontSize: "clamp(12px, 2.5vw, 13px)",
+              }}
+            >
               <th>Dato / Beskrivelse</th>
               <th style={{ display: "none" }} /* Hide on mobile */>Kategori</th>
               <th>Tagger</th>
@@ -364,10 +375,24 @@ export default function ExpenseApp() {
                 }}
               >
                 {/* DATO + BESKRIVELSE */}
-                <td style={{ padding: "12px", fontSize: "clamp(12px, 2.5vw, 14px)" }}>
-                  <div style={{ fontSize: "clamp(11px, 2vw, 12px)", color: "#6b7280" }}>{t.date}</div>
+                <td
+                  style={{
+                    padding: "12px",
+                    fontSize: "clamp(12px, 2.5vw, 14px)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "clamp(11px, 2vw, 12px)",
+                      color: "#6b7280",
+                    }}
+                  >
+                    {t.date}
+                  </div>
                   <div style={{ fontWeight: 500 }}>{t.description}</div>
-                  <div style={{ fontSize: "clamp(11px, 2vw, 12px)", marginTop: 4 }}>
+                  <div
+                    style={{ fontSize: "clamp(11px, 2vw, 12px)", marginTop: 4 }}
+                  >
                     <span
                       style={{
                         display: "inline-block",
@@ -400,7 +425,13 @@ export default function ExpenseApp() {
                   </span>
                 </td>
 
-                <td style={{ padding: "12px", minWidth: "200px", fontSize: "clamp(11px, 2vw, 12px)" }}>
+                <td
+                  style={{
+                    padding: "12px",
+                    minWidth: "200px",
+                    fontSize: "clamp(11px, 2vw, 12px)",
+                  }}
+                >
                   <div
                     style={{
                       display: "flex",

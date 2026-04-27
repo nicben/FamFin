@@ -13,6 +13,8 @@ import type { CategoryFilter, Transaction } from "./features/expenses/model";
 const TAGS_STORAGE_KEY = "famfin-transaction-tags";
 const TAGS_API_URL = "/api/tags";
 const AUTH_STORAGE_KEY = "famfin-auth";
+const VALID_USERNAME = "BenduVollan";
+const VALID_PASSWORD = "qwer1234";
 
 type TagsByTransactionId = Record<string, string[]>;
 
@@ -50,12 +52,14 @@ export default function ExpenseApp() {
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
 
-    // Simple validation - in production, validate against backend
-    if (username.trim() && password.trim()) {
+    // Validate against hardcoded credentials
+    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username }));
       setIsLoggedIn(true);
       setUsername("");
       setPassword("");
+    } else {
+      alert("Ugyldig brukernavn eller passord");
     }
   }
 

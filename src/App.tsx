@@ -12,6 +12,7 @@ import type { CategoryFilter, Transaction } from "./features/expenses/model";
 
 const TAGS_STORAGE_KEY = "famfin-transaction-tags";
 const TAGS_API_URL = "/api/tags";
+const AUTH_STORAGE_KEY = "famfin-auth";
 
 type TagsByTransactionId = Record<string, string[]>;
 
@@ -20,6 +21,9 @@ type TagsByTransactionId = Record<string, string[]>;
 // -----------------------------
 
 export default function ExpenseApp() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [category, setCategory] = useState<CategoryFilter>("ALL");
   const [month, setMonth] = useState<string | "ALL">("ALL");
@@ -35,7 +39,119 @@ export default function ExpenseApp() {
     "none",
   );
 
+  // Check if already logged in on mount
   useEffect(() => {
+    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (stored) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    
+    // Simple validation - in production, validate against backend
+    if (username.trim() && password.trim()) {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username }));
+      setIsLoggedIn(true);
+      setUsername("");
+      setPassword("");
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    setIsLoggedIn(false);
+    setUsername("");
+    setPassword("");
+  }
+
+  // If not logged in, show login screen
+  if (!isLoggedIn) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "clamp(16px, 4vw, 32px)",
+          fontFamily: "Inter, system-ui",
+        }}
+      >
+        <div
+          style={{
+            background: "white",
+            borderRadius: 12,
+            padding: "clamp(24px, 5vw, 40px)",
+            maxWidth: 400,
+            width: "100%",
+            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
+          }}
+        >
+          <h1 style={{ margin: "0 0 24px", fontSize: "clamp(24px, 5vw, 32px)", fontWeight: 600, textAlign: "center" }}>
+            FamFin
+          </h1>
+          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div>
+              <label style={{ display: "block", marginBottom: 8, fontWeight: 500, fontSize: "clamp(13px, 2.5vw, 14px)" }}>
+                Brukernavn
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Skriv inn brukernavn"
+                style={{
+                  width: "100%",
+                  padding: "clamp(8px, 2vw, 12px)",
+                  fontSize: "clamp(13px, 2.5vw, 14px)",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 6,
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", marginBottom: 8, fontWeight: 500, fontSize: "clamp(13px, 2.5vw, 14px)" }}>
+                Passord
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Skriv inn passord"
+                style={{
+                  width: "100%",
+                  padding: "clamp(8px, 2vw, 12px)",
+                  fontSize: "clamp(13px, 2.5vw, 14px)",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 6,
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              style={{
+                padding: "clamp(10px, 2.5vw, 12px)",
+                fontSize: "clamp(14px, 2.5vw, 16px)",
+                fontWeight: 600,
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                color: "white",
+                border: "none",
+                borderRadius: 6,
+                cursor: "pointer",
+              }}
+            >
+              Logg inn
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
     let cancelled = false;
 
     async function loadTags() {
@@ -222,14 +338,45 @@ export default function ExpenseApp() {
           marginBottom: 24,
           display: "flex",
           justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h1 style={{ margin: 0, fontWeight: 600 }}>
+            Økonomioversikt
+          </h1>
+        </div>
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: "8px 16px",
+            fontSize: "clamp(13px, 2.5vw, 14px)",
+            background: "#ef4444",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            cursor: "pointer",
+            fontWeight: 500,
+          }}
+        >
+          Logg ut
+        </button>
+      </div>
+
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          marginBottom: 24,
+          display: "flex",
+          justifyContent: "space-between",
           alignItems: "center",
           gap: 12,
           flexWrap: "wrap",
         }}
       >
-        <h1 style={{ margin: 0, fontWeight: 600, minWidth: "100%" }}>
-          Økonomioversikt
-        </h1>
         <input
           type="file"
           accept=".csv"

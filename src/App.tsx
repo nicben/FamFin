@@ -49,7 +49,7 @@ export default function ExpenseApp() {
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    
+
     // Simple validation - in production, validate against backend
     if (username.trim() && password.trim()) {
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username }));
@@ -90,12 +90,29 @@ export default function ExpenseApp() {
             boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
           }}
         >
-          <h1 style={{ margin: "0 0 24px", fontSize: "clamp(24px, 5vw, 32px)", fontWeight: 600, textAlign: "center" }}>
+          <h1
+            style={{
+              margin: "0 0 24px",
+              fontSize: "clamp(24px, 5vw, 32px)",
+              fontWeight: 600,
+              textAlign: "center",
+            }}
+          >
             FamFin
           </h1>
-          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <form
+            onSubmit={handleLogin}
+            style={{ display: "flex", flexDirection: "column", gap: 16 }}
+          >
             <div>
-              <label style={{ display: "block", marginBottom: 8, fontWeight: 500, fontSize: "clamp(13px, 2.5vw, 14px)" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontWeight: 500,
+                  fontSize: "clamp(13px, 2.5vw, 14px)",
+                }}
+              >
                 Brukernavn
               </label>
               <input
@@ -114,7 +131,14 @@ export default function ExpenseApp() {
               />
             </div>
             <div>
-              <label style={{ display: "block", marginBottom: 8, fontWeight: 500, fontSize: "clamp(13px, 2.5vw, 14px)" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontWeight: 500,
+                  fontSize: "clamp(13px, 2.5vw, 14px)",
+                }}
+              >
                 Passord
               </label>
               <input
@@ -346,9 +370,7 @@ export default function ExpenseApp() {
         }}
       >
         <div>
-          <h1 style={{ margin: 0, fontWeight: 600 }}>
-            Økonomioversikt
-          </h1>
+          <h1 style={{ margin: 0, fontWeight: 600 }}>Økonomioversikt</h1>
         </div>
         <button
           onClick={handleLogout}

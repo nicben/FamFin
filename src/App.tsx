@@ -211,7 +211,7 @@ export default function ExpenseApp() {
       style={{
         minHeight: "100vh",
         background: "#f5f6fa",
-        padding: 32,
+        padding: "clamp(16px, 4vw, 32px)",
         fontFamily: "Inter, system-ui",
       }}
     >
@@ -224,18 +224,28 @@ export default function ExpenseApp() {
           justifyContent: "space-between",
           alignItems: "center",
           gap: 12,
+          flexWrap: "wrap",
         }}
       >
-        <h1 style={{ margin: 0, fontWeight: 600 }}>Økonomioversikt</h1>
+        <h1 style={{ margin: 0, fontWeight: 600, minWidth: "100%" }}>
+          Økonomioversikt
+        </h1>
         <input
           type="file"
           accept=".csv"
           onChange={(e) => e.target.files && onCsv(e.target.files[0])}
+          style={{ flex: 1, minWidth: 150 }}
         />
         {loadSource === "auto" && (
-          <span>Bruker transactions.csv fra public</span>
+          <span style={{ flex: 1, minWidth: 200, fontSize: "0.9rem" }}>
+            Bruker transactions.csv fra public
+          </span>
         )}
-        {loadSource === "manual" && <span>Bruker manuelt opplastet CSV</span>}
+        {loadSource === "manual" && (
+          <span style={{ flex: 1, minWidth: 200, fontSize: "0.9rem" }}>
+            Bruker manuelt opplastet CSV
+          </span>
+        )}
       </div>
 
       <div
@@ -245,9 +255,13 @@ export default function ExpenseApp() {
           display: "flex",
           gap: 16,
           marginBottom: 24,
+          flexWrap: "wrap",
+          "@media (max-width: 768px)": {
+            flexDirection: "column",
+          }
         }}
       >
-        <select value={month} onChange={(e) => setMonth(e.target.value)}>
+        <select value={month} onChange={(e) => setMonth(e.target.value)} style={{ flex: 1, minWidth: 150 }}>
           <option value="ALL">Alle måneder</option>
           {months.map((m) => (
             <option key={m} value={m}>
@@ -259,6 +273,7 @@ export default function ExpenseApp() {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value as CategoryFilter)}
+          style={{ flex: 1, minWidth: 150 }}
         >
           <option value="ALL">Alle kategorier</option>
           {categories
@@ -270,7 +285,7 @@ export default function ExpenseApp() {
             ))}
         </select>
 
-        <select value={party} onChange={(e) => setParty(e.target.value)}>
+        <select value={party} onChange={(e) => setParty(e.target.value)} style={{ flex: 1, minWidth: 150 }}>
           <option value="ALL">Alle avsendere/mottakere</option>
           {parties
             .filter((p) => p !== "ALL")
@@ -284,6 +299,7 @@ export default function ExpenseApp() {
         <select
           value={tagFilter}
           onChange={(e) => setTagFilter(e.target.value)}
+          style={{ flex: 1, minWidth: 150 }}
         >
           <option value="ALL">Alle tagger</option>
           {tags
@@ -301,7 +317,7 @@ export default function ExpenseApp() {
           maxWidth: 1200,
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           gap: 16,
           marginBottom: 24,
         }}
@@ -318,6 +334,7 @@ export default function ExpenseApp() {
           background: "white",
           borderRadius: 12,
           padding: 16,
+          overflowX: "auto",
         }}
       >
         <table
@@ -325,12 +342,13 @@ export default function ExpenseApp() {
           style={{
             borderCollapse: "separate",
             borderSpacing: "0 6px",
+            minWidth: "100%",
           }}
         >
           <thead>
-            <tr style={{ textAlign: "left", color: "#6b7280", fontSize: 13 }}>
+            <tr style={{ textAlign: "left", color: "#6b7280", fontSize: "clamp(12px, 2.5vw, 13px)" }}>
               <th>Dato / Beskrivelse</th>
-              <th>Kategori</th>
+              <th style={{ display: "none" }} /* Hide on mobile */>Kategori</th>
               <th>Tagger</th>
               <th style={{ textAlign: "right" }}>Beløp</th>
             </tr>
@@ -346,13 +364,27 @@ export default function ExpenseApp() {
                 }}
               >
                 {/* DATO + BESKRIVELSE */}
-                <td style={{ padding: "10px 12px" }}>
-                  <div style={{ fontSize: 12, color: "#6b7280" }}>{t.date}</div>
+                <td style={{ padding: "12px", fontSize: "clamp(12px, 2.5vw, 14px)" }}>
+                  <div style={{ fontSize: "clamp(11px, 2vw, 12px)", color: "#6b7280" }}>{t.date}</div>
                   <div style={{ fontWeight: 500 }}>{t.description}</div>
+                  <div style={{ fontSize: "clamp(11px, 2vw, 12px)", marginTop: 4 }}>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        padding: "4px 8px",
+                        borderRadius: 999,
+                        background: "#eef2ff",
+                        color: "#4338ca",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {t.category}
+                    </span>
+                  </div>
                 </td>
 
-                {/* KATEGORI */}
-                <td style={{ padding: "10px 12px" }}>
+                {/* KATEGORI - Hidden on mobile */}
+                <td style={{ padding: "10px 12px", display: "none" }}>
                   <span
                     style={{
                       display: "inline-block",
@@ -368,7 +400,7 @@ export default function ExpenseApp() {
                   </span>
                 </td>
 
-                <td style={{ padding: "10px 12px", minWidth: 260 }}>
+                <td style={{ padding: "12px", minWidth: "200px", fontSize: "clamp(11px, 2vw, 12px)" }}>
                   <div
                     style={{
                       display: "flex",
@@ -390,9 +422,10 @@ export default function ExpenseApp() {
                           }}
                           placeholder="Ny tag"
                           style={{
-                            width: 110,
-                            fontSize: 12,
-                            padding: "4px 10px",
+                            width: "clamp(80px, 100%, 110px)",
+                            fontSize: "clamp(11px, 2vw, 12px)",
+                            padding: "6px 8px",
+                            boxSizing: "border-box",
                           }}
                         />
                         <button
@@ -401,8 +434,8 @@ export default function ExpenseApp() {
                             addTag(t.id, tagDraftByTransactionId[t.id] ?? "")
                           }
                           style={{
-                            fontSize: 12,
-                            padding: "4px 10px",
+                            fontSize: "clamp(11px, 2vw, 12px)",
+                            padding: "6px 12px",
                           }}
                         >
                           Legg til
@@ -421,8 +454,8 @@ export default function ExpenseApp() {
                           background: "#dcfce7",
                           color: "#166534",
                           borderRadius: 999,
-                          fontSize: 12,
-                          padding: "4px 10px",
+                          fontSize: "clamp(11px, 2vw, 12px)",
+                          padding: "4px 8px",
                           fontWeight: 500,
                           cursor: "pointer",
                         }}
@@ -436,11 +469,12 @@ export default function ExpenseApp() {
                 {/* BELØP */}
                 <td
                   style={{
-                    padding: "10px 12px",
+                    padding: "12px",
                     textAlign: "right",
                     fontWeight: 600,
                     color: t.amount < 0 ? "#dc2626" : "#16a34a",
                     whiteSpace: "nowrap",
+                    fontSize: "clamp(12px, 2.5vw, 14px)",
                   }}
                 >
                   {t.amount.toLocaleString("nb-NO")} kr

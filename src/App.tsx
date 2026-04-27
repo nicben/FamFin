@@ -152,6 +152,8 @@ export default function ExpenseApp() {
       </div>
     );
   }
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadTags() {

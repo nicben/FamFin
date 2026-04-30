@@ -73,130 +73,128 @@ export default function ExpenseApp() {
     setPassword("");
   }
 
-  // If not logged in, show login screen
-  if (!isLoggedIn) {
-    return (
+  // Keep hook order stable by preparing login UI without returning early.
+  const loginView = (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "clamp(16px, 4vw, 32px)",
+        fontFamily: "Inter, system-ui",
+      }}
+    >
       <div
         style={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "clamp(16px, 4vw, 32px)",
-          fontFamily: "Inter, system-ui",
+          background: "white",
+          borderRadius: 12,
+          padding: "clamp(24px, 5vw, 40px)",
+          maxWidth: 400,
+          width: "100%",
+          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
         }}
       >
-        <div
+        <h1
           style={{
-            background: "white",
-            borderRadius: 12,
-            padding: "clamp(24px, 5vw, 40px)",
-            maxWidth: 400,
-            width: "100%",
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
+            margin: "0 0 24px",
+            fontSize: "clamp(24px, 5vw, 32px)",
+            fontWeight: 600,
+            textAlign: "center",
           }}
         >
-          <h1
-            style={{
-              margin: "0 0 24px",
-              fontSize: "clamp(24px, 5vw, 32px)",
-              fontWeight: 600,
-              textAlign: "center",
-            }}
-          >
-            FamFin
-          </h1>
-          <form
-            onSubmit={handleLogin}
-            style={{ display: "flex", flexDirection: "column", gap: 16 }}
-          >
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: 8,
-                  fontWeight: 500,
-                  fontSize: "clamp(13px, 2.5vw, 14px)",
-                }}
-              >
-                Brukernavn
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Skriv inn brukernavn"
-                style={{
-                  width: "100%",
-                  padding: "clamp(8px, 2vw, 12px)",
-                  fontSize: "clamp(13px, 2.5vw, 14px)",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 6,
-                  boxSizing: "border-box",
-                }}
-              />
-            </div>
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: 8,
-                  fontWeight: 500,
-                  fontSize: "clamp(13px, 2.5vw, 14px)",
-                }}
-              >
-                Passord
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Skriv inn passord"
-                style={{
-                  width: "100%",
-                  padding: "clamp(8px, 2vw, 12px)",
-                  fontSize: "clamp(13px, 2.5vw, 14px)",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 6,
-                  boxSizing: "border-box",
-                }}
-              />
-            </div>
-            <button
-              type="submit"
+          FamFin
+        </h1>
+        <form
+          onSubmit={handleLogin}
+          style={{ display: "flex", flexDirection: "column", gap: 16 }}
+        >
+          <div>
+            <label
               style={{
-                padding: "clamp(10px, 2.5vw, 12px)",
-                fontSize: "clamp(14px, 2.5vw, 16px)",
-                fontWeight: 600,
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: 6,
-                cursor: "pointer",
+                display: "block",
+                marginBottom: 8,
+                fontWeight: 500,
+                fontSize: "clamp(13px, 2.5vw, 14px)",
               }}
             >
-              Logg inn
-            </button>
-            {loginError && (
-              <div
-                style={{
-                  padding: "clamp(8px, 2vw, 12px)",
-                  background: "#fee2e2",
-                  color: "#dc2626",
-                  borderRadius: 6,
-                  fontSize: "clamp(13px, 2.5vw, 14px)",
-                  textAlign: "center",
-                }}
-              >
-                {loginError}
-              </div>
-            )}
-          </form>
-        </div>
+              Brukernavn
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Skriv inn brukernavn"
+              style={{
+                width: "100%",
+                padding: "clamp(8px, 2vw, 12px)",
+                fontSize: "clamp(13px, 2.5vw, 14px)",
+                border: "1px solid #e5e7eb",
+                borderRadius: 6,
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+          <div>
+            <label
+              style={{
+                display: "block",
+                marginBottom: 8,
+                fontWeight: 500,
+                fontSize: "clamp(13px, 2.5vw, 14px)",
+              }}
+            >
+              Passord
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Skriv inn passord"
+              style={{
+                width: "100%",
+                padding: "clamp(8px, 2vw, 12px)",
+                fontSize: "clamp(13px, 2.5vw, 14px)",
+                border: "1px solid #e5e7eb",
+                borderRadius: 6,
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+          <button
+            type="submit"
+            style={{
+              padding: "clamp(10px, 2.5vw, 12px)",
+              fontSize: "clamp(14px, 2.5vw, 16px)",
+              fontWeight: 600,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: 6,
+              cursor: "pointer",
+            }}
+          >
+            Logg inn
+          </button>
+          {loginError && (
+            <div
+              style={{
+                padding: "clamp(8px, 2vw, 12px)",
+                background: "#fee2e2",
+                color: "#dc2626",
+                borderRadius: 6,
+                fontSize: "clamp(13px, 2.5vw, 14px)",
+                textAlign: "center",
+              }}
+            >
+              {loginError}
+            </div>
+          )}
+        </form>
       </div>
-    );
-  }
+    </div>
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -369,6 +367,10 @@ export default function ExpenseApp() {
   // -----------------------------
   // UI
   // -----------------------------
+  if (!isLoggedIn) {
+    return loginView;
+  }
+
   return (
     <div
       style={{

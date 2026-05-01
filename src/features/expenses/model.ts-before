@@ -78,7 +78,7 @@ export const ALL_CATEGORIES: readonly CategoryId[] = [
 const RULES: readonly CategoryRule[] = [
   {
     match:
-      /(lønn|lonn|salary|utbetaling|trumf|barnetrygd|tra i lønn|trakk for lite i lønn)/i,
+      /(lønn|lonn|salary|utbetaling|trumf|barnetrygd|tra i lønn|trakk for lite i lønn|^diverse$)/i,
     cat: "Inntekt",
   },
   { match: /(spar|mikrospar|fond|aksje|invest)/i, cat: "Sparing" },
@@ -88,61 +88,81 @@ const RULES: readonly CategoryRule[] = [
     cat: "Veldedighet",
   },
   {
-    match:
-      /(if forsikring|gjensidige|tryg|frende|storebrand forsikring|fremtind|codan|sparebank.*forsikring|dnb.*forsikring)/i,
-    cat: "Forsikring",
+    match: /(husleie|obos|sans|NORDEA FINANS|Svarttjernborettslag|kommune)/i,
+    cat: "Bolig & Kommunale tjenester",
   },
   {
     match:
-      /(tibber|gudbrandsdal energi|fjordkraft|lyse|agder energi|hafslund|fortum|nettleie)/i,
-    cat: "Strøm",
-  },
-  {
-    match: /(lånekassen|statens lånekasse)/i,
-    cat: "Studielån",
-  },
-  {
-    match:
-      /(victoria|babysam|lekmer|lekolar|jollyroom|mumio|babyshop|sebra|mini rodini|smallstuff|name it|barneklær|barnemat|bleie|pampers|huggies|lilleba|babynest|barnevogn|koelstra|stokke|cybex|bugaboo|maxi-cosi|barnehage|sfo|aktivitetsskole|babysitter|dagmamma)/i,
-    cat: "Victoria",
-  },
-  {
-    match:
-      /(restaurant|kafe|kafé|bar |pub |nattklubb|tapas|sushi|burrito|burger|grill|bistro|brasserie|uteliv|afterski|cocktail|vinbar|bryggeri|worldclass|olivia|cargo|justisen|internasjonalen|bon lío|bon lio|wolt|foodora|kebab|pizza|subway|texburger|illegal burger|kaffebrenneriet|\bkod\b)/i,
-    cat: "Restaurant & Uteliv",
-  },
-  {
-    match:
-      /(rema|kiwi|joker|backstube|coop|meny|oda|vinmonopolet|stop go|narvesen|extra|maximat)/i,
+      /(rema|kiwi|joker|backstube|coop|meny|oda|vinmonopolet|Stop Go|Narvesen|extra|maximat|fruit)/i,
     cat: "Mat & Dagligvarer",
   },
   {
     match:
-      /(ruter|vy|buss|tog|taxi|uber|bolt|bom|parkering|circle k|esso|st1|vianor)/i,
+      /(ruter|vy|buss|tog|taxi|uber|bolt|bom|parkering|autosync|seb kort|circle k|esso|st1|vianor)/i,
     cat: "Transport & Bil",
   },
   {
     match:
-      /(lege|apotek|tannlege|psykolog|boots|specavers|barber|hair|klinikk|house of curls)/i,
+      /(lege|apotek|tannlege|psykolog|boots|specavers|barber|hair|klinikk|spec(s)?avers|house of curls)/i,
     cat: "Helse & Personlig pleie",
   },
+  {
+    match:
+      /(mester grønn|tilbords|sandviks|elkjop|elkjøp|power|clas ohlson|kid|ikea|Normal|Norli|Europris|megaflis|tilbords|illums|biltema|jula|princess|megaflis|right price tiles|nill|augusto|netonnet)/i,
+    cat: "Handel",
+  },
+  { match: /^til: /i, cat: "Overføringer – Privat" },
+  { match: /(norsk tipping)/i, cat: "Spill & Gambling" },
+  { match: /(klarna|qliro|lea bank)/i, cat: "Diverse" },
   {
     match:
       /(kappahl|xxl|sport outlet|shoeday|kicks|zalando|cirkulaer|uff|tise|lindex|fretex)/i,
     cat: "Klær & Utstyr",
   },
   {
-    match:
-      /(bohus|skeidar|jysk|søstrene grene|sostrene grene|desenio|obs bygg|byggmakker|maxbo|mio |bolia|kitchn|ilva|nille|home&cottage|elkjøp|elkjop|power|netonnet|clas ohlson|sandviks|biltema|europris)/i,
-    cat: "Hjem & Interiør",
+    match: /(spotify|netflix|viaplay|icloud|google|apple|babyverden|BookBeat)/i,
+    cat: "Abonnement",
   },
   {
     match:
-      /(husleie|obos|sans|nordea finans|svarttjernborettslag|oslo kommune|kontingent)/i,
+      /(kino|tren|gym|reise|hotell|bibliotek|museum|ticketco|ishockey|kultur|hotel|flysamlingen|dubliner|valeren)/i,
+    cat: "Fritid",
+  },
+  {
+    match:
+      /(if forsikring|gjensidige|tryg|frende|storebrand forsikring|fremtind|codan|sparebank.*forsikring|dnb.*forsikring)/i,
+    cat: "Forsikring",
+  },
+  {
+    match:
+      /(tibber|gudbrandsdal energi|fjordkraft|lyse|agder energi|hafslund|fortum|strom|strøm|nettleie)/i,
+    cat: "Strøm",
+  },
+  {
+    match:
+      /(victoria|babyverden|babysam|lekmer|lekolar|jollyroom|mumio|babyshop|sebra|mini rodini|smallstuff|name it|kids|barneklær|barnemat|bleie|pampers|huggies|lilleba|nappies|natur|babynest|barnevogn|koelstra|stokke|cybex|bugaboo|maxi-cosi|bekkestua|barnehage|sfo|aktivitetsskole|babysitter|dagmamma)/i,
+    cat: "Victoria",
+  },
+  {
+    match:
+      /(restaurant|kafe|kafé|bar |pub |nattklubb|tapas|sushi|burrito|burger|grill|bistro|brasserie|uteliv|afterski|shots|cocktail|vinbar|bryggeri|worldclass|olivia|cargo|justisen|internasjonalen|bon lío|bon lio|wolt|foodora|osushi|kebab|pizza|subway|texburger|illegal burger|kaffebrenneriet|kod)/i,
+    cat: "Restaurant & Uteliv",
+  },
+  {
+    match:
+      /(ikea|kid interiør|kid interio|bohus|skeidar|jysk|home&cottage|home &|nille|søstrene grene|sostrene grene|desenio|jollyroom|obs bygg|byggmakker|maxbo|clas ohlson.*interiør|mio |bolia|home depot|kitchn|ilva|lekolar)/i,
+    cat: "Hjem & Interiør",
+  },
+  {
+    match: /(lånekassen|studielån|statens lånekasse)/i,
+    cat: "Studielån",
+  },
+  { match: /(renter|kreditt|visa|mastercard)/i, cat: "Diverse" },
+  { match: /(vipps|overforing)/i, cat: "Overføring" },
+  {
+    match: /(oslo kommune|kontingent)/i,
     cat: "Bolig & Kommunale tjenester",
   },
-  { match: /^til: /i, cat: "Overføringer – Privat" },
-  { match: /(norsk tipping)/i, cat: "Spill & Gambling" },
 ];
 
 export function isCategoryId(value?: string): value is CategoryId {

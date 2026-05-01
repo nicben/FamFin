@@ -1,4 +1,4 @@
-type Tab = "overview" | "transactions" | "tags" | "settings";
+type Tab = "overview" | "transactions" | "budget" | "settings";
 
 type BottomNavProps = {
   active: Tab;
@@ -9,7 +9,7 @@ export function BottomNav({ active, onChange }: BottomNavProps) {
   const items: { id: Tab; label: string; icon: string }[] = [
     { id: "overview", label: "Oversikt", icon: "🏠" },
     { id: "transactions", label: "Poster", icon: "📄" },
-    { id: "tags", label: "Tagger", icon: "🏷️" },
+    { id: "budget", label: "Budsjett", icon: "💰" },
     { id: "settings", label: "Innst.", icon: "⚙️" },
   ];
 

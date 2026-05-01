@@ -15,18 +15,27 @@ import type { CategoryFilter, Transaction } from "./features/expenses/model";
 const TAGS_STORAGE_KEY = "famfin-transaction-tags";
 const TAGS_API_URL = "/api/tags";
 const AUTH_STORAGE_KEY = "famfin-auth";
+const BUDGET_STORAGE_KEY = "famfin-budget";
+
 const VALID_USERNAME = "BenduVollan";
 const VALID_PASSWORD = "qwer1234";
 
 type TagsByTransactionId = Record<string, string[]>;
-type Tab = "overview" | "transactions" | "tags" | "settings";
+type BudgetByCategory = Record<string, number>;
+type Tab = "overview" | "transactions" | "budget" | "settings";
 
 export default function ExpenseApp() {
+  // -----------------------------
+  // AUTH
+  // -----------------------------
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
 
+  // -----------------------------
+  // DATA
+  // -----------------------------
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [category, setCategory] = useState<CategoryFilter>("ALL");
   const [month, setMonth] = useState<string | "ALL">("ALL");
@@ -41,6 +50,9 @@ export default function ExpenseApp() {
   const [tagInputOpen, setTagInputOpen] = useState<Record<string, boolean>>({});
 
   const [tagsHydrated, setTagsHydrated] = useState(false);
+
+  const [budget, setBudget] = useState<BudgetByCategory>({});
+
   const [loadSource, setLoadSource] = useState<"auto" | "manual" | "none">(
     "none",
   );
@@ -48,21 +60,19 @@ export default function ExpenseApp() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   // -----------------------------
-  // AUTH
+  // AUTH EFFECT
   // -----------------------------
   useEffect(() => {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (stored) setIsLoggedIn(true);
+    if (localStorage.getItem(AUTH_STORAGE_KEY)) {
+      setIsLoggedIn(true);
+    }
   }, []);
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setLoginError("");
     if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username }));
+      localStorage.setItem(AUTH_STORAGE_KEY, "ok");
       setIsLoggedIn(true);
-      setUsername("");
-      setPassword("");
     } else {
       setLoginError("Ugyldig brukernavn eller passord");
     }
@@ -82,20 +92,18 @@ export default function ExpenseApp() {
 
     async function loadTags() {
       try {
-        const response = await fetch(TAGS_API_URL, { cache: "no-store" });
-        if (response.ok) {
-          const parsed = (await response.json()) as TagsByTransactionId;
+        const r = await fetch(TAGS_API_URL, { cache: "no-store" });
+        if (r.ok) {
+          const parsed = (await r.json()) as TagsByTransactionId;
           if (!cancelled) setTagsByTransactionId(parsed);
           return;
         }
       } catch {}
 
-      try {
-        const stored = localStorage.getItem(TAGS_STORAGE_KEY);
-        if (!cancelled && stored) {
-          setTagsByTransactionId(JSON.parse(stored));
-        }
-      } catch {}
+      const local = localStorage.getItem(TAGS_STORAGE_KEY);
+      if (!cancelled && local) {
+        setTagsByTransactionId(JSON.parse(local));
+      }
     }
 
     loadTags().finally(() => !cancelled && setTagsHydrated(true));
@@ -116,31 +124,34 @@ export default function ExpenseApp() {
   }, [tagsByTransactionId, tagsHydrated]);
 
   // -----------------------------
+  // BUDGET LOAD / SAVE
+  // -----------------------------
+  useEffect(() => {
+    const stored = localStorage.getItem(BUDGET_STORAGE_KEY);
+    if (stored) {
+      setBudget(JSON.parse(stored));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(BUDGET_STORAGE_KEY, JSON.stringify(budget));
+  }, [budget]);
+
+  // -----------------------------
   // CSV
   // -----------------------------
   useEffect(() => {
-    let cancelled = false;
-
-    async function loadDefaultCsv() {
-      try {
-        const response = await fetch("/transactions.csv", {
-          cache: "no-store",
-        });
-        if (!response.ok) return;
-        const text = await response.text();
-        if (cancelled) return;
+    fetch("/transactions.csv", { cache: "no-store" })
+      .then((r) => (r.ok ? r.text() : null))
+      .then((text) => {
+        if (!text) return;
         const parsed = parseCsvTransactions(text);
-        if (parsed.length > 0) {
+        if (parsed.length) {
           setTransactions(parsed);
           setLoadSource("auto");
         }
-      } catch {}
-    }
-
-    loadDefaultCsv();
-    return () => {
-      cancelled = true;
-    };
+      })
+      .catch(() => {});
   }, []);
 
   function onCsv(file: File) {
@@ -216,8 +227,18 @@ export default function ExpenseApp() {
     ];
   }, [tagsByTransactionId]);
 
+  const actualByCategory = useMemo(() => {
+    const result: Record<string, number> = {};
+    for (const t of transactions) {
+      if (t.amount < 0) {
+        result[t.category] = (result[t.category] ?? 0) + Math.abs(t.amount);
+      }
+    }
+    return result;
+  }, [transactions]);
+
   // -----------------------------
-  // LOGIN VIEW
+  // LOGIN UI
   // -----------------------------
   if (!isLoggedIn) {
     return (
@@ -231,39 +252,30 @@ export default function ExpenseApp() {
           justifyContent: "center",
         }}
       >
-        <div
-          style={{
-            background: "white",
-            padding: 32,
-            borderRadius: 16,
-            width: 320,
-          }}
-        >
-          <h1 style={{ textAlign: "center" }}>FamFin</h1>
+        <div style={{ background: "white", padding: 32, borderRadius: 16 }}>
+          <h1>FamFin</h1>
           <input
             placeholder="Brukernavn"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            style={{ width: "100%", padding: 10, marginBottom: 12 }}
+            style={{ width: "100%", marginBottom: 12 }}
           />
           <input
             type="password"
             placeholder="Passord"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{ width: "100%", padding: 10, marginBottom: 12 }}
+            style={{ width: "100%", marginBottom: 12 }}
           />
-          <button style={{ width: "100%", padding: 10 }}>Logg inn</button>
-          {loginError && (
-            <p style={{ color: "red", marginTop: 8 }}>{loginError}</p>
-          )}
+          <button>Logg inn</button>
+          {loginError && <p style={{ color: "red" }}>{loginError}</p>}
         </div>
       </form>
     );
   }
 
   // -----------------------------
-  // APP UI (MOBIL‑FØRST)
+  // APP UI
   // -----------------------------
   return (
     <div
@@ -274,19 +286,12 @@ export default function ExpenseApp() {
         fontFamily: "Inter, system-ui",
       }}
     >
-      <h1 style={{ marginBottom: 16 }}>Økonomioversikt</h1>
+      <h1>Økonomioversikt</h1>
 
       {activeTab === "overview" && (
         <div style={{ display: "flex", gap: 12, overflowX: "auto" }}>
-          <div style={{ minWidth: 180 }}>
-            <Kpi title="Netto" value={`${total.toLocaleString("nb-NO")} kr`} />
-          </div>
-          <div style={{ minWidth: 160 }}>
-            <Kpi title="Transaksjoner" value={filtered.length} />
-          </div>
-          <div style={{ minWidth: 160 }}>
-            <Kpi title="Måned" value={month === "ALL" ? "Alle" : month} />
-          </div>
+          <Kpi title="Netto" value={`${total.toLocaleString("nb-NO")} kr`} />
+          <Kpi title="Transaksjoner" value={filtered.length} />
         </div>
       )}
 
@@ -386,7 +391,7 @@ export default function ExpenseApp() {
                 style={{ display: "flex", gap: 12, alignItems: "flex-start" }}
               >
                 {/* Venstre: beskrivelse, dato, kategori */}
-                <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
                       fontWeight: 600,
@@ -445,7 +450,6 @@ export default function ExpenseApp() {
                     {t.amount.toLocaleString("nb-NO")} kr
                   </strong>
 
-                  {/* Tagg-seksjon */}
                   {(tagsByTransactionId[t.id] ?? []).length > 0 ? (
                     <span
                       style={{
@@ -566,6 +570,117 @@ export default function ExpenseApp() {
         </div>
       )}
 
+      {activeTab === "budget" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <p style={{ fontSize: 13, color: theme.color.muted, marginTop: 0 }}>
+            Sett månedlig budsjett per kategori. Tallene viser faktisk forbruk
+            fra alle transaksjoner.
+          </p>
+          {categories
+            .filter((c) => c !== "ALL")
+            .map((c) => {
+              const planned = budget[c] ?? 0;
+              const actual = actualByCategory[c] ?? 0;
+              const pct =
+                planned > 0 ? Math.min((actual / planned) * 100, 100) : 0;
+              const over = planned > 0 && actual > planned;
+              const diff = planned - actual;
+
+              return (
+                <div
+                  key={c}
+                  style={{
+                    background: theme.color.card,
+                    padding: "14px 16px",
+                    borderRadius: 16,
+                    boxShadow: theme.shadow.card,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: 6,
+                    }}
+                  >
+                    <strong style={{ fontSize: 14 }}>{c}</strong>
+                    {planned > 0 && (
+                      <span
+                        style={{
+                          fontSize: 13,
+                          color: over
+                            ? theme.color.danger
+                            : theme.color.success,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {diff < 0
+                          ? `-${Math.abs(diff).toLocaleString("nb-NO")} kr`
+                          : `+${diff.toLocaleString("nb-NO")} kr`}
+                      </span>
+                    )}
+                  </div>
+                  {planned > 0 && (
+                    <div
+                      style={{
+                        background: "#f3f4f6",
+                        borderRadius: 999,
+                        height: 6,
+                        marginBottom: 8,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${pct}%`,
+                          height: "100%",
+                          background: over
+                            ? theme.color.danger
+                            : theme.color.primary,
+                          borderRadius: 999,
+                          transition: "width 0.3s",
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: theme.color.muted,
+                        flex: 1,
+                      }}
+                    >
+                      Brukt: {actual.toLocaleString("nb-NO")} kr
+                    </span>
+                    <input
+                      type="number"
+                      value={planned || ""}
+                      placeholder="Budsjett kr"
+                      onChange={(e) =>
+                        setBudget((prev) => ({
+                          ...prev,
+                          [c]: Number(e.target.value),
+                        }))
+                      }
+                      style={{
+                        width: 110,
+                        padding: "6px 10px",
+                        borderRadius: 8,
+                        border: "1px solid #ddd",
+                        fontSize: 14,
+                        textAlign: "right",
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      )}
+
       {activeTab === "settings" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
@@ -605,8 +720,6 @@ export default function ExpenseApp() {
           </button>
         </div>
       )}
-
-      {activeTab === "tags" && <div>Tagg‑oversikt kommer</div>}
 
       <BottomNav active={activeTab} onChange={setActiveTab} />
     </div>

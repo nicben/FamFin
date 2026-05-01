@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { theme } from "../theme";
 
 type KpiProps = {
   title: string;
@@ -9,21 +10,21 @@ export function Kpi({ title, value }: KpiProps) {
   return (
     <div
       style={{
-        background: "white",
-        borderRadius: 12,
-        padding: "clamp(12px, 3vw, 16px)",
+        background: theme.color.card,
+        borderRadius: theme.radius.card,
+        padding: 16,
+        boxShadow: theme.shadow.card,
       }}
     >
+      <div style={{ fontSize: 13, color: theme.color.muted }}>{title}</div>
       <div
         style={{
-          fontSize: "clamp(12px, 2.5vw, 13px)",
-          color: "#64748b",
-          marginBottom: 6,
+          fontSize: 22,
+          fontWeight: 700,
+          marginTop: 6,
+          color: theme.color.text,
         }}
       >
-        {title}
-      </div>
-      <div style={{ fontSize: "clamp(18px, 4vw, 22px)", fontWeight: 600 }}>
         {value}
       </div>
     </div>

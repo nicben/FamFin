@@ -260,7 +260,7 @@ export function parseCsvTransactions(csvText: string): Transaction[] {
 
     // Description er det brukeren ser i tabellen.
     const descriptionParts = [tekst || type];
-    if (fraKonto && fraKonto !== tilKonto) {
+    if (fraKonto && fraKonto !== tilKonto && !GENERIC_PARTIES.has(fraKonto)) {
       descriptionParts.push(fraKonto);
     }
     const description = [...new Set(descriptionParts)]

@@ -15,7 +15,11 @@ export type CategoryId =
   | "Victoria"
   | "Restaurant & Uteliv"
   | "Hjem & Interiør"
-  | "Studielån";
+  | "Studielån"
+  | "Fritid"
+  | "Abonnement"
+  | "Lån"
+  | "Gaver";
 
 export type CategoryFilter = CategoryId | "ALL";
 
@@ -71,11 +75,19 @@ export const ALL_CATEGORIES: readonly CategoryId[] = [
   "Studielån",
   "Victoria",
   "Spill & Gambling",
+  "Fritid",
+  "Abonnement",
+  "Lån",
+  "Gaver",
   "Overføringer – Privat",
   "Diverse",
 ] as const;
 
 const RULES: readonly CategoryRule[] = [
+  {
+    match: /(lanekassen|statens lanekasse|statens l.nekasse for utdannin)/i,
+    cat: "Studielån",
+  },
   {
     match:
       /(lønn|lonn|salary|utbetaling|trumf|barnetrygd|tra i lønn|trakk for lite i lønn)/i,
@@ -94,16 +106,12 @@ const RULES: readonly CategoryRule[] = [
   },
   {
     match:
-      /(tibber|gudbrandsdal energi|fjordkraft|lyse|agder energi|hafslund|fortum|nettleie)/i,
+      /(tibber|gudbrandsdal energi|fjordkraft|lyse|vibb|hafslund|fortum|nettleie)/i,
     cat: "Strøm",
   },
   {
-    match: /(lånekassen|statens lånekasse)/i,
-    cat: "Studielån",
-  },
-  {
     match:
-      /(victoria|babysam|lekmer|lekolar|jollyroom|mumio|babyshop|sebra|mini rodini|smallstuff|name it|barneklær|barnemat|bleie|pampers|huggies|lilleba|babynest|barnevogn|koelstra|stokke|cybex|bugaboo|maxi-cosi|barnehage|sfo|aktivitetsskole|babysitter|dagmamma)/i,
+      /(victoria|babysam|lekmer|lekolar|jollyroom|mumio|babyshop|sebra|mini rodini|smallstuff|name it|barneklær|barnemat|bleie|pampers|huggies|lilleba|babynest|barnevogn|koelstra|stokke|cybex|bugaboo|maxi-cosi|barnehage|sfo|aktivitetsskole|babysitter|Oslo Kommune Utdanningsetaten)/i,
     cat: "Victoria",
   },
   {
@@ -123,7 +131,7 @@ const RULES: readonly CategoryRule[] = [
   },
   {
     match:
-      /(lege|apotek|tannlege|psykolog|boots|specavers|barber|hair|klinikk|house of curls)/i,
+      /(lege|apotek|tannlege|psykolog|boots|specavers|barber|hair|klinikk|house of curls|Skinsecret)/i,
     cat: "Helse & Personlig pleie",
   },
   {
@@ -133,16 +141,26 @@ const RULES: readonly CategoryRule[] = [
   },
   {
     match:
-      /(bohus|skeidar|jysk|søstrene grene|sostrene grene|desenio|obs bygg|byggmakker|maxbo|mio |bolia|kitchn|ilva|nille|home&cottage|elkjøp|elkjop|power|netonnet|clas ohlson|sandviks|biltema|europris)/i,
+      /(bohus|skeidar|jysk|søstrene grene|sostrene grene|desenio|obs bygg|byggmakker|maxbo|mio |bolia|kitchn|ilva|nille|home&cottage|elkjøp|elkjop|power|netonnet|clas ohlson|sandviks|biltema|europris|ikea|mester grønn|tilbords|megaflis|illums|jula|princess|right price tiles|kid interiør|kid interio)/i,
     cat: "Hjem & Interiør",
   },
   {
     match:
-      /(husleie|obos|sans|nordea finans|svarttjernborettslag|oslo kommune|kontingent)/i,
+      /(husleie|obos|sans|nordea finans|svarttjernborettslag|oslo kommune|kontingent|nedbetaling.*lan|lan.*nedbetaling|bulder boliglan)/i,
     cat: "Bolig & Kommunale tjenester",
   },
   { match: /^til: /i, cat: "Overføringer – Privat" },
   { match: /(norsk tipping)/i, cat: "Spill & Gambling" },
+  {
+    match:
+      /(kino|stolt trening|valerenga|vålerenga|gym|treningssenter|sats |fresh fitness|evo fitness|bibliotek|museum|ticketco|ishockey|konsert|kultur|reise|hotell|hotel|flysamlingen|dubliner|escape room|paintball|bowling|aktivitetspark|bergenbanen|flybuss)/i,
+    cat: "Fritid",
+  },
+  {
+    match:
+      /(apple|babyverden|spotify|netflix|viaplay|icloud|google play|apple\.com|bookbeat|hbo max|disney\+|storytel|audible)/i,
+    cat: "Abonnement",
+  },
 ];
 
 export function isCategoryId(value?: string): value is CategoryId {
@@ -292,6 +310,13 @@ export function extractMonths(transactions: Transaction[]): string[] {
   return Array.from(
     new Set(transactions.map((t) => t.date.slice(0, 7))),
   ).sort();
+}
+
+/** Henter tilgjengelige år som YYYY. */
+export function extractYears(transactions: Transaction[]): string[] {
+  return Array.from(new Set(transactions.map((t) => t.date.slice(0, 4))))
+    .sort()
+    .reverse();
 }
 
 /** Henter kategorier som faktisk finnes i datasettet. */

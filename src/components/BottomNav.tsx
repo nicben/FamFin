@@ -3,9 +3,10 @@ type Tab = "overview" | "transactions" | "budget" | "settings";
 type BottomNavProps = {
   active: Tab;
   onChange: (tab: Tab) => void;
+  darkMode?: boolean;
 };
 
-export function BottomNav({ active, onChange }: BottomNavProps) {
+export function BottomNav({ active, onChange, darkMode }: BottomNavProps) {
   const items: { id: Tab; label: string; icon: string }[] = [
     { id: "overview", label: "Oversikt", icon: "🏠" },
     { id: "transactions", label: "Poster", icon: "📄" },
@@ -21,8 +22,8 @@ export function BottomNav({ active, onChange }: BottomNavProps) {
         left: 0,
         right: 0,
         paddingBottom: "env(safe-area-inset-bottom)",
-        background: "#ffffff",
-        borderTop: "1px solid #e5e7eb",
+        background: darkMode ? "#1a1d27" : "#ffffff",
+        borderTop: `1px solid ${darkMode ? "#2d3748" : "#e5e7eb"}`,
         display: "flex",
         justifyContent: "space-around",
         zIndex: 50,
@@ -41,7 +42,11 @@ export function BottomNav({ active, onChange }: BottomNavProps) {
               background: "none",
               border: "none",
               fontSize: 12,
-              color: activeItem ? "#6d3a7c" : "#6b7280",
+              color: activeItem
+                ? darkMode
+                  ? "#c084fc"
+                  : "#6d3a7c"
+                : "#6b7280",
               fontWeight: activeItem ? 600 : 500,
               display: "flex",
               flexDirection: "column",

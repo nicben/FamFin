@@ -24,7 +24,21 @@ function setupSchema(db) {
       transaction_id TEXT NOT NULL,
       tag TEXT NOT NULL,
       PRIMARY KEY (transaction_id, tag)
-    )
+    );
+
+    CREATE TABLE IF NOT EXISTS budget_current (
+      singleton INTEGER PRIMARY KEY DEFAULT 1,
+      data TEXT NOT NULL DEFAULT '{}'
+    );
+
+    INSERT OR IGNORE INTO budget_current (singleton, data) VALUES (1, '{}');
+
+    CREATE TABLE IF NOT EXISTS budget_versions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      label TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      data TEXT NOT NULL
+    );
   `);
 }
 
@@ -161,6 +175,96 @@ app.put("/api/tags", (req, res) => {
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
+});
+
+// -------------------------
+// BUDGET API
+// -------------------------
+app.get("/api/budget", (_req, res) => {
+  try {
+    const row = db
+      .prepare("SELECT data FROM budget_current WHERE singleton = 1")
+      .get();
+    res.setHeader("Cache-Control", "no-store");
+    res.json(row ? JSON.parse(row.data) : {});
+  } catch {
+    res.status(500).json({ error: "Kunne ikke lese budsjett" });
+  }
+});
+
+app.put("/api/budget", (req, res) => {
+  const data = req.body;
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    res.status(400).json({ error: "Ugyldig budsjett-format" });
+    return;
+  }
+  try {
+    db.prepare("UPDATE budget_current SET data = ? WHERE singleton = 1").run(
+      JSON.stringify(data),
+    );
+    res.status(204).send();
+  } catch {
+    res.status(500).json({ error: "Kunne ikke lagre budsjett" });
+  }
+});
+
+app.get("/api/budget/versions", (_req, res) => {
+  try {
+    const rows = db
+      .prepare(
+        "SELECT id, label, created_at FROM budget_versions ORDER BY id DESC",
+      )
+      .all();
+    res.setHeader("Cache-Control", "no-store");
+    res.json(rows);
+  } catch {
+    res.status(500).json({ error: "Kunne ikke hente versjoner" });
+  }
+});
+
+app.get("/api/budget/versions/:id", (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    res.status(400).json({ error: "Ugyldig versjon-id" });
+    return;
+  }
+  try {
+    const row = db
+      .prepare("SELECT data FROM budget_versions WHERE id = ?")
+      .get(id);
+    if (!row) {
+      res.status(404).json({ error: "Versjon ikke funnet" });
+      return;
+    }
+    res.json(JSON.parse(row.data));
+  } catch {
+    res.status(500).json({ error: "Kunne ikke hente versjon" });
+  }
+});
+
+app.post("/api/budget/versions", (req, res) => {
+  const { label } = req.body ?? {};
+  if (!label || typeof label !== "string" || !label.trim()) {
+    res.status(400).json({ error: "Mangler label" });
+    return;
+  }
+  try {
+    const current = db
+      .prepare("SELECT data FROM budget_current WHERE singleton = 1")
+      .get();
+    const data = current?.data ?? "{}";
+    const created_at = new Date().toISOString();
+    const result = db
+      .prepare(
+        "INSERT INTO budget_versions (label, created_at, data) VALUES (?, ?, ?)",
+      )
+      .run(label.trim(), created_at, data);
+    res
+      .status(201)
+      .json({ id: result.lastInsertRowid, label: label.trim(), created_at });
+  } catch {
+    res.status(500).json({ error: "Kunne ikke lagre versjon" });
+  }
 });
 
 app.use(express.static(DIST_DIR));

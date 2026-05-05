@@ -33,8 +33,8 @@ Dato;Beløp;Originalt Beløp;Original Valuta;Til konto;Til kontonummer;Fra konto
 2026-01-16;-544,00;-544,00;NOK;;Stop Go Asian Kitch - Vipps;Felleskonto;3610.78.44559;Betaling;Stop Go Asian Kitch - Vipps;;Mat og drikke;Restaurant
 2026-01-17;-49,00;-49,00;NOK;;Babyverden;Felleskonto;3610.78.44559;Betaling;Babyverden;;Media;Internettjenester
 2026-01-18;-1195,00;-1195,00;NOK;;9100.30.84553;Felleskonto;3610.78.44559;Betaling;Til: Christine Brown Vollan;;Mat og drikke;Dagligvarer
-2026-01-19;700,00;700,00;NOK;Felleskonto;3610.78.44559;👰‍♀️🤵‍♂️;3610.06.90920;Overføring;Overført fra sparekontoen til Christian;;;
-2026-01-19;1100,00;1100,00;NOK;Felleskonto;3610.78.44559;👰‍♀️🤵‍♂️;3610.06.90920;Overføring;Overført til Christian;;;
+2026-01-19;700,00;700,00;NOK;Felleskonto;3610.78.44559;Christian sin;3610.06.90920;Overføring;Overført fra sparekontoen til Christian;;;
+2026-01-19;1100,00;1100,00;NOK;Felleskonto;3610.78.44559;Christian sin;3610.06.90920;Overføring;Overført til Christian;;;
 2026-01-19;-700,00;-700,00;NOK;;1225.89.14668;Felleskonto;3610.78.44559;Betaling;Til: Christian Deco Kamara-Taylor;;Diverse;Vipps
 2026-01-19;2000,00;2000,00;NOK;Felleskonto;3610.78.44559;BULDER BRUKSKONTO;3610.78.44540;Overføring;Ekstra i lønn;;;
 2026-01-19;-50,00;-50,00;NOK;;Dyrevernalliansen;Felleskonto;3610.78.44559;Betaling;Dyrevernalliansen;;Diverse;Veldedighet
@@ -377,7 +377,7 @@ Dato;Beløp;Originalt Beløp;Original Valuta;Til konto;Til kontonummer;Fra konto
 2026-04-04;-67,80;-67,80;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Dagligvarer
 2026-04-04;-10,00;-10,00;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Dagligvarer
 2026-04-04;-46,00;-46,00;NOK;;Ruter;Felleskonto;3610.78.44559;Betaling;Ruter;;Reise og transport;Offentlig transport
-2026-04-05;3997,00;3997,00;NOK;Felleskonto;3610.78.44559;👰‍♀️🤵‍♂️;3610.06.90920;Overføring;Penger vi har gitt tidligere;;;
+2026-04-05;3997,00;3997,00;NOK;Felleskonto;3610.78.44559;Christian sin;3610.06.90920;Overføring;Penger vi har gitt tidligere;;;
 2026-04-06;-360,00;-360,00;NOK;;9100.30.84553;Felleskonto;3610.78.44559;Betaling;Til: Christine Brown Vollan;;Diverse;Vipps
 2026-04-06;-50,00;-50,00;NOK;;Norsk Tipping;Felleskonto;3610.78.44559;Betaling;Norsk Tipping;;Diverse;Pengespill
 2026-04-06;-100,90;-100,90;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Dagligvarer
@@ -463,11 +463,46 @@ Dato;Beløp;Originalt Beløp;Original Valuta;Til konto;Til kontonummer;Fra konto
 2026-04-23;-80,00;-80,00;NOK;;Avaaz;Felleskonto;3610.78.44559;Betaling;Avaaz;;Diverse;Veldedighet
 2026-04-24;5000,00;5000,00;NOK;Felleskonto;3610.78.44559;Buffer;3610.78.98314;Overføring;;;;
 2026-04-24;-649,73;-649,73;NOK;;REMA 1000;Felleskonto;3610.78.44559;Betaling;REMA 1000;;Mat og drikke;Dagligvarer
-2026-04-24;-1800,00;-1800,00;NOK;;;Felleskonto;3610.78.44559;Betaling;HOUSE OF CURLS;;;
-2026-04-24;-600,00;-600,00;NOK;;;Felleskonto;3610.78.44559;Betaling;GF234619461;;;
+2026-04-24;-1800,00;-1800,00;NOK;;;Felleskonto;3610.78.44559;Betaling;HOUSE OF CURLS;;Helse og velvære;Frisør
+2026-04-24;-600,00;-600,00;NOK;;;Felleskonto;3610.78.44559;Betaling;GF234619461;;Handel;Diverse
 2026-04-24;-53,90;-53,90;NOK;;KIWI;Felleskonto;3610.78.44559;Betaling;KIWI;;Mat og drikke;Dagligvarer
 2026-04-25;-129,00;-129,00;NOK;;Apple;Felleskonto;3610.78.44559;Betaling;Apple;;Media;Internettjenester
-2026-04-25;-194,70;-194,70;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Kiosk
-2026-04-25;-454,75;-454,75;NOK;;Coop Extra;Felleskonto;3610.78.44559;Betaling;Coop Extra;;Mat og drikke;Spesialforretning
-2026-04-25;-51,80;-51,80;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Kiosk
-2026-04-25;-1128,25;-1128,25;NOK;;Coop Extra;Felleskonto;3610.78.44559;Betaling;Coop Extra;;Mat og drikke;Spesialforretning
+2026-04-25;-194,70;-194,70;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Dagligvarer
+2026-04-25;-454,75;-454,75;NOK;;Coop Extra;Felleskonto;3610.78.44559;Betaling;Coop Extra;;Mat og drikke;Dagligvarer
+2026-04-25;-51,80;-51,80;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Dagligvarer
+2026-04-25;-1128,25;-1128,25;NOK;;Coop Extra;Felleskonto;3610.78.44559;Betaling;Coop Extra;;Mat og drikke;Dagligvarer
+2026-04-26;5000,00;5000,00;NOK;Felleskonto;3610.78.44559;Buffer;3610.78.98314;Overføring;;;;
+2026-04-26;-150,00;-150,00;NOK;;Amnesty International Norway;Felleskonto;3610.78.44559;Betaling;Amnesty International Norway;;Ukategorisert;Kortbetalinger
+2026-04-26;-43,70;-43,70;NOK;;Ruter;Felleskonto;3610.78.44559;Betaling;Ruter;;Reise og transport;Offentlig transport
+2026-04-26;-43,70;-43,70;NOK;;Ruter;Felleskonto;3610.78.44559;Betaling;Ruter;;Reise og transport;Offentlig transport
+2026-04-27;-5168,00;-5168,00;NOK;;6006.05.24559;Felleskonto;3610.78.44559;Efaktura;NORDEA FINANS NORGE;3019995307182372;Bil;Billån
+2026-04-27;-50,00;-50,00;NOK;;Norsk Tipping;Felleskonto;3610.78.44559;Betaling;Norsk Tipping;;Diverse;Pengespill
+2026-04-27;-724,62;-724,62;NOK;;KIWI;Felleskonto;3610.78.44559;Betaling;KIWI;;Mat og drikke;Dagligvarer
+2026-04-28;-516,80;-516,80;NOK;;1503.25.40934;Felleskonto;3610.78.44559;Efaktura;AUTOSYNC;310007136483980345707191;Bil;Bompenger
+2026-04-28;-80,00;-80,00;NOK;;Avaaz;Felleskonto;3610.78.44559;Betaling;Avaaz;;Diverse;Veldedighet
+2026-04-29;-234,50;-234,50;NOK;;Coop Extra;Felleskonto;3610.78.44559;Betaling;Coop Extra;;Mat og drikke;Dagligvarer
+2026-04-29;-80,15;-80,15;NOK;;Coop Extra;Felleskonto;3610.78.44559;Betaling;Coop Extra;;Mat og drikke;Dagligvarer
+2026-04-29;-39,90;-39,90;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Dagligvarer
+2026-04-30;43000,00;43000,00;NOK;Felleskonto;3610.78.44559;;0539.37.99953;Betaling;Helge M K Brown Vollan;;;
+2026-04-30;-443,00;-443,00;NOK;;;Felleskonto;3610.78.44559;Betaling;FRETEX UNIVERSITETSGATA;;;
+2026-04-30;-498,00;-498,00;NOK;;XXL Sport;Felleskonto;3610.78.44559;Betaling;XXL Sport;;Mat og drikke;Spesialforretning
+2026-04-30;-257,32;-257,32;NOK;;KIWI;Felleskonto;3610.78.44559;Betaling;KIWI;;Mat og drikke;Dagligvarer
+2026-04-30;-195,00;-195,00;NOK;;;Felleskonto;3610.78.44559;Betaling;CIRKULAER;;;
+2026-04-30;-441,00;-441,00;NOK;;Tise;Felleskonto;3610.78.44559;Betaling;Tise;;Handel;Klær og sko
+2026-05-01;-149,00;-149,00;NOK;;;Felleskonto;3610.78.44559;Betaling;SANDVIKS AS;;;
+2026-05-01;-69,00;-69,00;NOK;;Joker;Felleskonto;3610.78.44559;Betaling;Joker;;Mat og drikke;Kiosk
+2026-05-02;-1039,23;-1039,23;NOK;;;Felleskonto;3610.78.44559;Betaling;KIWI 334 ROMSAAS;;;
+2026-05-02;-632,44;-632,44;NOK;;Esso;Felleskonto;3610.78.44559;Betaling;Esso;;Bil;Drivstoff
+2026-05-02;-95,30;-95,30;NOK;;Vinmonopolet;Felleskonto;3610.78.44559;Betaling;Vinmonopolet;;Mat og drikke;Spesialforretning
+2026-05-02;-231,42;-231,42;NOK;;Extra;Felleskonto;3610.78.44559;Betaling;Extra;;Mat og drikke;Dagligvarer
+2026-05-02;-94,80;-94,80;NOK;;Europris.no;Felleskonto;3610.78.44559;Betaling;Europris.no;;Hus og hjem;Diverse
+2026-05-02;-79,80;-79,80;NOK;;Coop Extra;Felleskonto;3610.78.44559;Betaling;Coop Extra;;Mat og drikke;Spesialforretning
+2026-05-04;-235,00;-235,00;NOK;;;Felleskonto;3610.78.44559;Betaling;CHRISTIAN GRORU;;;
+2026-05-04;-1520,00;-1520,00;NOK;;1315.01.02906;Felleskonto;3610.78.44559;Efaktura;Oslo Kommune Utdanningsetaten;12424438518976249131138;;
+2026-05-04;-9358,72;-9358,72;NOK;;9820.18.15606;Felleskonto;3610.78.44559;Efaktura;OBOS FACTORING AS;0062931301027304217;;
+2026-05-04;-1000,00;-1000,00;NOK;Ferie;3610.11.20737;Felleskonto;3610.78.44559;Betaling;3610.11.20737;;;
+2026-05-04;-2000,00;-2000,00;NOK;Buffer;3610.78.98314;Felleskonto;3610.78.44559;Betaling;3610.78.98314;;;
+2026-05-04;2012,00;2012,00;NOK;Felleskonto;3610.78.44559;;;Betaling;Avtale;;;
+2026-05-04;-50,00;-50,00;NOK;;Norsk Tipping;Felleskonto;3610.78.44559;Betaling;Norsk Tipping;;Diverse;Pengespill
+2026-05-04;-179,00;-179,00;NOK;;;Felleskonto;3610.78.44559;Betaling;VIPPS Vestli Legesente;;;
+2026-05-04;-269,92;-269,92;NOK;;KIWI;Felleskonto;3610.78.44559;Betaling;KIWI;;Mat og drikke;Dagligvarer

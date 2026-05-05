@@ -3,15 +3,14 @@ export type CategoryId =
   | "Sparing"
   | "Veldedighet"
   | "Diverse"
-  | "Bolig & Kommunale tjenester"
+  | "Bolig & Strøm"
   | "Mat & Dagligvarer"
-  | "Transport & Bil"
+  | "Bil & transport"
   | "Helse & Personlig pleie"
   | "Overføringer – Privat"
   | "Spill & Gambling"
   | "Klær & Utstyr"
   | "Forsikring"
-  | "Strøm"
   | "Victoria"
   | "Restaurant & Uteliv"
   | "Hjem & Interiør"
@@ -51,6 +50,14 @@ const GENERIC_PARTIES = new Set([
   "Desiree Yanikain Bendu",
 ]);
 const INCOME_ACCOUNT_NUMBERS = new Set(["0539.37.99953", "3610.78.44540"]);
+// Egne spare-/bufferkonto: overføringer hit fra Felleskonto skal telle som Sparing
+const OWN_SAVINGS_ACCOUNT_NUMBERS = new Set([
+  "3610.78.98314", // Buffer
+  "3610.12.65220", // Bil
+  "3610.10.55757", // Sparing Victoria
+  "3610.06.90920", // 👰‍♀️🤵‍♂️
+  "3610.11.20737", // Ferie
+]);
 const INCOME_SOURCES = [
   "bulderbrukskonto",
   "36107844540",
@@ -63,15 +70,14 @@ export const ALL_CATEGORIES: readonly CategoryId[] = [
   "Inntekt",
   "Sparing",
   "Veldedighet",
-  "Bolig & Kommunale tjenester",
+  "Bolig & Strøm",
   "Mat & Dagligvarer",
   "Restaurant & Uteliv",
-  "Transport & Bil",
+  "Bil & transport",
   "Helse & Personlig pleie",
   "Klær & Utstyr",
   "Hjem & Interiør",
   "Forsikring",
-  "Strøm",
   "Studielån",
   "Victoria",
   "Spill & Gambling",
@@ -107,7 +113,7 @@ const RULES: readonly CategoryRule[] = [
   {
     match:
       /(tibber|gudbrandsdal energi|fjordkraft|lyse|vibb|hafslund|fortum|nettleie)/i,
-    cat: "Strøm",
+    cat: "Bolig & Strøm",
   },
   {
     match:
@@ -121,17 +127,17 @@ const RULES: readonly CategoryRule[] = [
   },
   {
     match:
-      /(rema|kiwi|joker|backstube|coop|meny|oda|vinmonopolet|stop go|narvesen|extra|maximat)/i,
+      /(rema|kiwi|joker|backstube|coop|meny|oda|vinmonopolet|stop go|narvesen|extra|maximat|ROMSAAS FRUKT OG GROENT)/i,
     cat: "Mat & Dagligvarer",
   },
   {
     match:
-      /(ruter|vy|buss|tog|taxi|uber|bolt|bom|parkering|circle k|esso|st1|vianor)/i,
-    cat: "Transport & Bil",
+      /(ruter|vy|buss|tog|taxi|uber|bolt|bom|parkering|circle k|esso|st1|vianor|NORDEA FINANS NORGE|nordea finans|AUTOSYNC|autosync)/i,
+    cat: "Bil & transport",
   },
   {
     match:
-      /(lege|apotek|tannlege|psykolog|boots|specavers|barber|hair|klinikk|house of curls|Skinsecret)/i,
+      /(lege|apotek|tannlege|psykolog|boots|specavers|barber|hair|klinikk|house of curls|Skinsecret|CHRISTIAN GRORU)/i,
     cat: "Helse & Personlig pleie",
   },
   {
@@ -141,13 +147,13 @@ const RULES: readonly CategoryRule[] = [
   },
   {
     match:
-      /(bohus|skeidar|jysk|søstrene grene|sostrene grene|desenio|obs bygg|byggmakker|maxbo|mio |bolia|kitchn|ilva|nille|home&cottage|elkjøp|elkjop|power|netonnet|clas ohlson|sandviks|biltema|europris|ikea|mester grønn|tilbords|megaflis|illums|jula|princess|right price tiles|kid interiør|kid interio)/i,
+      /(bohus|skeidar|jysk|søstrene grene|sostrene grene|desenio|obs bygg|byggmakker|maxbo|mio |bolia|kitchn|ilva|nille|home&cottage|elkjøp|elkjop|power|netonnet|clas ohlson|sandviks|biltema|europris|ikea|mester grønn|tilbords|megaflis|illums|jula|princess|right price tiles|kid interiør|kid interio|kid)/i,
     cat: "Hjem & Interiør",
   },
   {
     match:
       /(husleie|obos|sans|nordea finans|svarttjernborettslag|oslo kommune|kontingent|nedbetaling.*lan|lan.*nedbetaling|bulder boliglan)/i,
-    cat: "Bolig & Kommunale tjenester",
+    cat: "Bolig & Strøm",
   },
   { match: /^til: /i, cat: "Overføringer – Privat" },
   { match: /(norsk tipping)/i, cat: "Spill & Gambling" },
@@ -167,7 +173,7 @@ export function isCategoryId(value?: string): value is CategoryId {
   return !!value && (ALL_CATEGORIES as readonly string[]).includes(value);
 }
 
-function normalize(value: string): string {
+export function normalize(value: string): string {
   return value
     .toLowerCase()
     .normalize("NFKD")
@@ -250,7 +256,7 @@ export function parseCsvTransactions(csvText: string): Transaction[] {
 
   const headers = lines[0].split(";");
 
-  return lines.slice(1).map((line, index) => {
+  return lines.slice(1).map((line) => {
     const values = line.split(";");
     const row = Object.fromEntries(
       headers.map((header, colIndex): [string, string] => [
@@ -287,8 +293,12 @@ export function parseCsvTransactions(csvText: string): Transaction[] {
       .filter(Boolean)
       .join(" ");
 
+    const dato = getField(row, "Dato", "ukjent");
+    const rawBelop = getField(row, "Beløp", "Belop", "0");
+    const stableId = `${dato}|${rawBelop}|${tekst}|${fraKontonr}|${tilKontonr}|${type}`;
+
     return {
-      id: `${getField(row, "Dato", "ukjent")}-${index}`,
+      id: stableId,
       date: getField(row, "Dato"),
       description,
       amount,
@@ -298,9 +308,11 @@ export function parseCsvTransactions(csvText: string): Transaction[] {
       tilKontonr,
       category: isIncomeAccount(fraKontonr, fraKonto)
         ? "Inntekt"
-        : isCategoryId(explicitCategory)
-          ? explicitCategory
-          : autoCategory(categoryContext),
+        : amount < 0 && OWN_SAVINGS_ACCOUNT_NUMBERS.has(tilKontonr.trim())
+          ? "Sparing"
+          : isCategoryId(explicitCategory)
+            ? explicitCategory
+            : autoCategory(categoryContext),
     };
   });
 }

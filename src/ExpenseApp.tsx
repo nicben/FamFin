@@ -9,6 +9,7 @@ import {
   extractParties,
   extractYears,
   filterTransactions,
+  normalize,
   parseCsvTransactions,
   sumTransactions,
 } from "./features/expenses/model";
@@ -70,6 +71,10 @@ export default function ExpenseApp() {
   const [expandedBudgetCat, setExpandedBudgetCat] = useState<string | null>(
     null,
   );
+  const [modalTxs, setModalTxs] = useState<{
+    title: string;
+    txs: Transaction[];
+  } | null>(null);
 
   const [loadSource, setLoadSource] = useState<"auto" | "manual" | "none">(
     "none",
@@ -341,16 +346,14 @@ export default function ExpenseApp() {
           : transactions;
     const TAG_ROUTED = new Set(TAG_BUDGET_KEYS.map((k) => k.toLowerCase()));
     const REROUTE_CATS = new Set(["Diverse", "Overføringer – Privat"]);
-    // Kart fra lowercase kategorinavn → original CategoryId
-    const catLowerMap = new Map(
-      ALL_CATEGORIES.map((c) => [c.toLowerCase(), c]),
-    );
+    // Kart fra normalisert kategorinavn → original CategoryId (tåler "lan" = "lån" osv.)
+    const catLowerMap = new Map(ALL_CATEGORIES.map((c) => [normalize(c), c]));
     for (const t of txs) {
       const tTags = tagsByTransactionId[t.id] ?? [];
       // Hvis en tag er et gyldig kategorinavn, tell alltid beløpet der (uansett fortegn)
       let usedCategoryTag = false;
       for (const tag of tTags) {
-        const resolvedCat = catLowerMap.get(tag.toLowerCase());
+        const resolvedCat = catLowerMap.get(normalize(tag));
         if (resolvedCat) {
           result[resolvedCat] = (result[resolvedCat] ?? 0) + Math.abs(t.amount);
           usedCategoryTag = true;
@@ -606,6 +609,68 @@ export default function ExpenseApp() {
                 ))}
             </select>
           </div>
+
+          {/* Totaloversikt for filtrert periode */}
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              padding: "10px 14px",
+              background: theme.color.card,
+              borderRadius: 12,
+              boxShadow: theme.shadow.card,
+              fontSize: 13,
+            }}
+          >
+            <div style={{ flex: 1 }}>
+              <div style={{ color: theme.color.muted, marginBottom: 2 }}>
+                Inntekter
+              </div>
+              <div style={{ fontWeight: 700, color: theme.color.incomeText }}>
+                {filtered
+                  .filter((t) => t.amount > 0)
+                  .reduce((s, t) => s + t.amount, 0)
+                  .toLocaleString("nb-NO")}{" "}
+                kr
+              </div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ color: theme.color.muted, marginBottom: 2 }}>
+                Utgifter
+              </div>
+              <div style={{ fontWeight: 700, color: theme.color.danger }}>
+                {filtered
+                  .filter((t) => t.amount < 0)
+                  .reduce((s, t) => s + Math.abs(t.amount), 0)
+                  .toLocaleString("nb-NO")}{" "}
+                kr
+              </div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ color: theme.color.muted, marginBottom: 2 }}>
+                Netto
+              </div>
+              <div
+                style={{
+                  fontWeight: 700,
+                  color:
+                    total >= 0 ? theme.color.incomeText : theme.color.danger,
+                }}
+              >
+                {total.toLocaleString("nb-NO")} kr
+              </div>
+            </div>
+            <div
+              style={{
+                alignSelf: "center",
+                color: theme.color.muted,
+                fontSize: 12,
+              }}
+            >
+              {filtered.length} poster
+            </div>
+          </div>
+
           {filtered.map((t) => (
             <div
               key={t.id}
@@ -668,6 +733,24 @@ export default function ExpenseApp() {
                     >
                       {t.category}
                     </span>
+
+                    {t.category === "Sparing" && t.tilKonto && (
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          background: "#d1fae5",
+                          color: "#065f46",
+                          padding: "4px 10px",
+                          borderRadius: 999,
+                          fontSize: 12,
+                          lineHeight: "normal",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {t.tilKonto}
+                      </span>
+                    )}
 
                     {(tagsByTransactionId[t.id] ?? []).length > 0 ? (
                       <span
@@ -893,6 +976,75 @@ export default function ExpenseApp() {
             {month !== "ALL" ? month : year !== "ALL" ? year : "alle perioder"}
           </p>
 
+          {/* Sparing – fremhevet øverst */}
+          {(() => {
+            const savingsPlanned = budget["Sparing"] ?? 0;
+            const savingsActual = actualByCategory["Sparing"] ?? 0;
+            const savingsDiff = savingsActual - savingsPlanned;
+            const periodTxs =
+              month !== "ALL"
+                ? transactions.filter((t) => t.date.startsWith(month))
+                : year !== "ALL"
+                  ? transactions.filter((t) => t.date.startsWith(year))
+                  : transactions;
+            const savingsTxs = periodTxs.filter(
+              (t) => t.category === "Sparing" && t.amount < 0,
+            );
+            return (
+              <div
+                onClick={() =>
+                  setModalTxs({ title: "Sparing", txs: savingsTxs })
+                }
+                style={{
+                  background: "linear-gradient(135deg, #065f46, #059669)",
+                  borderRadius: 16,
+                  padding: "16px 18px",
+                  boxShadow: theme.shadow.card,
+                  color: "white",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: 13, opacity: 0.85, marginBottom: 2 }}>
+                    💰 Sparing denne perioden
+                  </div>
+                  <div style={{ fontSize: 24, fontWeight: 800 }}>
+                    {savingsActual.toLocaleString("nb-NO")} kr
+                  </div>
+                  {savingsPlanned > 0 && (
+                    <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>
+                      Mål: {savingsPlanned.toLocaleString("nb-NO")} kr
+                    </div>
+                  )}
+                </div>
+                {savingsPlanned > 0 && (
+                  <div
+                    style={{
+                      background:
+                        savingsDiff >= 0
+                          ? "rgba(255,255,255,0.25)"
+                          : "rgba(255,100,100,0.3)",
+                      borderRadius: 12,
+                      padding: "8px 14px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: 11, opacity: 0.85 }}>
+                      {savingsDiff >= 0 ? "over mål" : "under mål"}
+                    </div>
+                    <div style={{ fontSize: 18, fontWeight: 700 }}>
+                      {savingsDiff >= 0 ? "+" : ""}
+                      {savingsDiff.toLocaleString("nb-NO")} kr
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Sammendrag: inntekt og utgifter */}
           <div style={{ display: "flex", gap: 10 }}>
             <div
@@ -924,10 +1076,27 @@ export default function ExpenseApp() {
               </div>
               {totalTransfersIn > 0 && (
                 <div
+                  onClick={() => {
+                    const periodTxs =
+                      month !== "ALL"
+                        ? transactions.filter((t) => t.date.startsWith(month))
+                        : year !== "ALL"
+                          ? transactions.filter((t) => t.date.startsWith(year))
+                          : transactions;
+                    const transferTxs = periodTxs.filter(
+                      (t) => t.amount > 0 && t.category !== "Inntekt",
+                    );
+                    setModalTxs({
+                      title: "Overføringer inn",
+                      txs: transferTxs,
+                    });
+                  }}
                   style={{
                     fontSize: 12,
                     color: theme.color.incomeSubText,
                     marginTop: 4,
+                    cursor: "pointer",
+                    textDecoration: "underline dotted",
                   }}
                 >
                   + {totalTransfersIn.toLocaleString("nb-NO")} kr overføringer
@@ -962,6 +1131,25 @@ export default function ExpenseApp() {
               >
                 {totalExpenses.toLocaleString("nb-NO")} kr
               </div>
+              {(() => {
+                const remaining =
+                  totalIncome + totalTransfersIn - totalExpenses;
+                return (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      marginTop: 6,
+                      color: remaining >= 0 ? "#15803d" : theme.color.danger,
+                    }}
+                  >
+                    {remaining >= 0 ? "▼" : "▲"}{" "}
+                    {remaining >= 0
+                      ? `${remaining.toLocaleString("nb-NO")} kr gjestår av inntekt`
+                      : `${Math.abs(remaining).toLocaleString("nb-NO")} kr over inntekt`}
+                  </div>
+                );
+              })()}
             </div>
           </div>
 
@@ -979,6 +1167,7 @@ export default function ExpenseApp() {
                 planned > 0 ? Math.min((actual / planned) * 100, 100) : 0;
               const over = planned > 0 && actual > planned;
               const diff = planned - actual;
+              if (c === "Sparing") return null; // vises separat øverst
 
               return (
                 <div
@@ -1096,12 +1285,12 @@ export default function ExpenseApp() {
                               )
                             : transactions;
                       const catLowerMap = new Map(
-                        ALL_CATEGORIES.map((cat) => [cat.toLowerCase(), cat]),
+                        ALL_CATEGORIES.map((cat) => [normalize(cat), cat]),
                       );
                       const catTxs = periodTxs.filter((t) => {
                         const tTags = tagsByTransactionId[t.id] ?? [];
                         const tagCat = tTags
-                          .map((tag) => catLowerMap.get(tag.toLowerCase()))
+                          .map((tag) => catLowerMap.get(normalize(tag)))
                           .find(Boolean);
                         if (tagCat) return tagCat === c;
                         return t.category === c && t.amount < 0;
@@ -1158,6 +1347,20 @@ export default function ExpenseApp() {
                                   </div>
                                   <div style={{ color: theme.color.muted }}>
                                     {t.date}
+                                    {t.category === "Sparing" && t.tilKonto && (
+                                      <span
+                                        style={{
+                                          marginLeft: 6,
+                                          background: "#d1fae5",
+                                          color: "#065f46",
+                                          padding: "1px 7px",
+                                          borderRadius: 999,
+                                          fontSize: 11,
+                                        }}
+                                      >
+                                        {t.tilKonto}
+                                      </span>
+                                    )}
                                   </div>
                                   {/* Tagg */}
                                   <div style={{ marginTop: 4 }}>
@@ -1524,6 +1727,71 @@ export default function ExpenseApp() {
             );
           })}
 
+          {/* Totalrad */}
+          {(() => {
+            const allBudgetCats = [
+              ...budgetDisplayCategories.filter(
+                (c) =>
+                  !TAG_BUDGET_KEYS.includes(
+                    c as (typeof TAG_BUDGET_KEYS)[number],
+                  ),
+              ),
+              ...TAG_BUDGET_KEYS,
+            ];
+            const totalPlanned = allBudgetCats.reduce(
+              (s, c) => s + (budget[c] ?? 0),
+              0,
+            );
+            const totalActual = allBudgetCats.reduce(
+              (s, c) =>
+                s +
+                (TAG_BUDGET_KEYS.includes(c as (typeof TAG_BUDGET_KEYS)[number])
+                  ? (actualByTag[c] ?? 0)
+                  : (actualByCategory[c] ?? 0)),
+              0,
+            );
+            const totalDiff = totalPlanned - totalActual;
+            const totalOver = totalPlanned > 0 && totalActual > totalPlanned;
+            return (
+              <div
+                style={{
+                  background: theme.color.card,
+                  padding: "14px 16px",
+                  borderRadius: 16,
+                  boxShadow: theme.shadow.card,
+                  borderTop: `2px solid ${theme.color.primary}`,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <strong style={{ fontSize: 15 }}>Totalt budsjett</strong>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 16, fontWeight: 700 }}>
+                    {totalPlanned.toLocaleString("nb-NO")} kr
+                  </div>
+                  {totalPlanned > 0 && (
+                    <div
+                      style={{
+                        fontSize: 13,
+                        color: totalOver
+                          ? theme.color.danger
+                          : theme.color.success,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Brukt: {totalActual.toLocaleString("nb-NO")} kr
+                      {"  "}
+                      {totalDiff < 0
+                        ? `(−${Math.abs(totalDiff).toLocaleString("nb-NO")} kr)`
+                        : `(+${totalDiff.toLocaleString("nb-NO")} kr igjen)`}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Versjonshistorikk */}
           {budgetVersions.length > 0 && (
             <div
@@ -1606,6 +1874,167 @@ export default function ExpenseApp() {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Modal for sparing / overføringer inn */}
+      {modalTxs && (
+        <div
+          onClick={() => setModalTxs(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: theme.color.card,
+              borderRadius: "20px 20px 0 0",
+              width: "100%",
+              maxWidth: 600,
+              maxHeight: "75vh",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 -4px 32px rgba(0,0,0,0.2)",
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "16px 20px 12px",
+                borderBottom: `1px solid ${theme.color.rowBorder}`,
+              }}
+            >
+              <strong style={{ fontSize: 16 }}>{modalTxs.title}</strong>
+              <button
+                onClick={() => setModalTxs(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 22,
+                  cursor: "pointer",
+                  color: theme.color.muted,
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            </div>
+            {/* Liste */}
+            <div style={{ overflowY: "auto", padding: "8px 0" }}>
+              {modalTxs.txs.length === 0 ? (
+                <div
+                  style={{
+                    padding: "16px 20px",
+                    fontSize: 14,
+                    color: theme.color.muted,
+                  }}
+                >
+                  Ingen transaksjoner
+                </div>
+              ) : (
+                modalTxs.txs.map((t, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "10px 20px",
+                      borderBottom:
+                        i < modalTxs.txs.length - 1
+                          ? `1px solid ${theme.color.rowBorder}`
+                          : "none",
+                      background:
+                        i % 2 === 0 ? theme.color.rowAlt : theme.color.card,
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontWeight: 500,
+                          fontSize: 14,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {t.description}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: theme.color.muted,
+                          marginTop: 2,
+                        }}
+                      >
+                        {t.date}
+                        {t.tilKonto && (
+                          <span
+                            style={{
+                              marginLeft: 8,
+                              background: "#d1fae5",
+                              color: "#065f46",
+                              padding: "1px 7px",
+                              borderRadius: 999,
+                              fontSize: 11,
+                            }}
+                          >
+                            {t.tilKonto}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 14,
+                        color:
+                          t.amount < 0
+                            ? theme.color.danger
+                            : theme.color.incomeText,
+                        marginLeft: 12,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {Math.abs(t.amount).toLocaleString("nb-NO")} kr
+                    </div>
+                  </div>
+                ))
+              )}
+              {/* Sum */}
+              {modalTxs.txs.length > 0 && (
+                <div
+                  style={{
+                    padding: "12px 20px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontWeight: 700,
+                    fontSize: 15,
+                    borderTop: `2px solid ${theme.color.primary}`,
+                    marginTop: 4,
+                  }}
+                >
+                  <span>Totalt</span>
+                  <span>
+                    {modalTxs.txs
+                      .reduce((s, t) => s + Math.abs(t.amount), 0)
+                      .toLocaleString("nb-NO")}{" "}
+                    kr
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

@@ -117,7 +117,7 @@ const RULES: readonly CategoryRule[] = [
   },
   {
     match:
-      /(victoria|babysam|lekmer|lekolar|jollyroom|mumio|babyshop|sebra|mini rodini|smallstuff|name it|barneklær|barnemat|bleie|pampers|huggies|lilleba|babynest|barnevogn|koelstra|stokke|cybex|bugaboo|maxi-cosi|barnehage|sfo|aktivitetsskole|babysitter|Oslo Kommune Utdanningsetaten)/i,
+      /(victoria|babysam|lekmer|lekolar|jollyroom|mumio|babyshop|sebra|mini rodini|smallstuff|name it|barneklær|barnemat|bleie|pampers|huggies|lilleba|babynest|barnevogn|koelstra|stokke|cybex|bugaboo|maxi-cosi|barnehage|sfo|aktivitetsskole|babysitter|Oslo Kommune Utdanningsetaten|Extra Leker)/i,
     cat: "Victoria",
   },
   {

@@ -223,22 +223,288 @@ export default function ExpenseDashboard({ onLogout }: Props) {
   // UI
   // -----------------------------
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f6fa" }}>
-      <button onClick={onLogout}>Logg ut</button>
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: 20,
+        background:
+          "radial-gradient(circle at top left, rgba(109,58,124,0.08), transparent 34%), linear-gradient(180deg, #f7f4fb 0%, #f4f6fb 100%)",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1180,
+          margin: "0 auto",
+          display: "grid",
+          gap: 16,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 12,
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 13, color: "#6b7280" }}>FamFin</div>
+            <h1 style={{ margin: 0, fontSize: 28 }}>Tagger og transaksjoner</h1>
+          </div>
 
-      <input
-        type="file"
-        accept=".csv"
-        onChange={(e) => e.target.files && onCsv(e.target.files[0])}
-      />
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => e.target.files && onCsv(e.target.files[0])}
+            />
+            <button onClick={onLogout}>Logg ut</button>
+          </div>
+        </div>
 
-      {loadSource === "auto" && <p>Bruker transactions.csv fra public</p>}
-      {loadSource === "manual" && <p>Bruker manuelt opplastet CSV</p>}
+        {loadSource === "auto" && <p>Bruker transactions.csv fra public</p>}
+        {loadSource === "manual" && <p>Bruker manuelt opplastet CSV</p>}
 
-      <Kpi title="Netto" value={`${total.toLocaleString("nb-NO")} kr`} />
-      <Kpi title="Transaksjoner" value={filtered.length} />
+        <div
+          style={{
+            display: "grid",
+            gap: 12,
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            padding: 16,
+            borderRadius: 18,
+            background: "rgba(255,255,255,0.78)",
+            border: "1px solid rgba(109,58,124,0.12)",
+            boxShadow: "0 12px 30px rgba(17,24,39,0.06)",
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontSize: 12, color: "#6b7280" }}>Kategori</span>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as CategoryFilter)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 12,
+                border: "1px solid #d8dbe3",
+              }}
+            >
+              <option value="ALL">Alle</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </label>
 
-      {/* Tabellen / resten av UI-en din kan være uendret her */}
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontSize: 12, color: "#6b7280" }}>Måned</span>
+            <select
+              value={month}
+              onChange={(e) => setMonth(e.target.value as string | "ALL")}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 12,
+                border: "1px solid #d8dbe3",
+              }}
+            >
+              <option value="ALL">Alle</option>
+              {months.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontSize: 12, color: "#6b7280" }}>
+              Avsender/mottaker
+            </span>
+            <select
+              value={party}
+              onChange={(e) => setParty(e.target.value)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 12,
+                border: "1px solid #d8dbe3",
+              }}
+            >
+              <option value="ALL">Alle</option>
+              {parties.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontSize: 12, color: "#6b7280" }}>Taggfilter</span>
+            <select
+              value={tagFilter}
+              onChange={(e) => setTagFilter(e.target.value)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 12,
+                border: "1px solid #d8dbe3",
+              }}
+            >
+              {tags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gap: 12,
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          }}
+        >
+          <Kpi title="Netto" value={`${total.toLocaleString("nb-NO")} kr`} />
+          <Kpi title="Transaksjoner" value={filtered.length} />
+        </div>
+
+        <div style={{ display: "grid", gap: 12 }}>
+          {filtered.map((tx) => {
+            const currentTags = tagsByTransactionId[tx.id] ?? [];
+            const draft = tagDraftByTransactionId[tx.id] ?? "";
+
+            return (
+              <article
+                key={tx.id}
+                style={{
+                  padding: 16,
+                  borderRadius: 18,
+                  background: "rgba(255,255,255,0.9)",
+                  border: "1px solid rgba(17,24,39,0.06)",
+                  boxShadow: "0 10px 24px rgba(17,24,39,0.05)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "#6b7280",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {tx.date}
+                    </div>
+                    <strong
+                      style={{
+                        display: "block",
+                        fontSize: 16,
+                        marginBottom: 4,
+                      }}
+                    >
+                      {tx.description}
+                    </strong>
+                    <div style={{ fontSize: 13, color: "#6b7280" }}>
+                      {tx.category}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 16,
+                      color: tx.amount < 0 ? "#b91c1c" : "#15803d",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {tx.amount.toLocaleString("nb-NO")} kr
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 8,
+                    marginTop: 12,
+                  }}
+                >
+                  {currentTags.map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => removeTag(tx.id, tag)}
+                      style={{
+                        border: "1px solid rgba(109,58,124,0.18)",
+                        background: "#f3ecf8",
+                        color: "#6d3a7c",
+                        borderRadius: 999,
+                        padding: "6px 10px",
+                        fontSize: 12,
+                        cursor: "pointer",
+                      }}
+                    >
+                      #{tag} ×
+                    </button>
+                  ))}
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    marginTop: 12,
+                    alignItems: "center",
+                  }}
+                >
+                  <input
+                    value={draft}
+                    onChange={(e) => updateTagDraft(tx.id, e.target.value)}
+                    placeholder="Legg til tagg"
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      padding: "10px 12px",
+                      borderRadius: 12,
+                      border: "1px solid #d8dbe3",
+                      background: "#fff",
+                    }}
+                  />
+                  <button
+                    onClick={() => addTag(tx.id, draft)}
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: 12,
+                      border: "none",
+                      background: "#6d3a7c",
+                      color: "white",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Legg til
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

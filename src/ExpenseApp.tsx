@@ -35,6 +35,25 @@ type BudgetByCategory = Record<string, number>;
 type BudgetVersion = { id: number; label: string; created_at: string };
 type Tab = "overview" | "transactions" | "budget" | "settings";
 
+const TAB_TITLES: Record<Tab, { title: string; subtitle: string }> = {
+  overview: {
+    title: "Oversikt",
+    subtitle: "Oppsummering av økonomien din",
+  },
+  transactions: {
+    title: "Transaksjoner",
+    subtitle: "Filtrer, se og tagg poster",
+  },
+  budget: {
+    title: "Budsjett",
+    subtitle: "Følg plan og faktisk forbruk",
+  },
+  settings: {
+    title: "Innstillinger",
+    subtitle: "Tilpasninger og lagrede valg",
+  },
+};
+
 export default function ExpenseApp() {
   // -----------------------------
   // AUTH
@@ -484,6 +503,8 @@ export default function ExpenseApp() {
   // -----------------------------
   // APP UI
   // -----------------------------
+  const currentTab = TAB_TITLES[activeTab];
+
   return (
     <div
       style={{
@@ -494,7 +515,9 @@ export default function ExpenseApp() {
         fontFamily: "Inter, system-ui",
       }}
     >
-      <h1>Økonomioversikt</h1>
+      <div style={{ paddingTop: 12, marginBottom: 20 }}>
+        <h1 style={{ margin: 0, color: theme.color.primary }}>{currentTab.title}</h1>
+      </div>
 
       {activeTab === "overview" && (
         <div style={{ display: "flex", gap: 12, overflowX: "auto" }}>
@@ -638,7 +661,7 @@ export default function ExpenseApp() {
               <div style={{ color: theme.color.muted, marginBottom: 2 }}>
                 Utgifter
               </div>
-              <div style={{ fontWeight: 700, color: theme.color.danger }}>
+              <div style={{ fontWeight: 700, color: "#ffffff" }}>
                 {filtered
                   .filter((t) => t.amount < 0)
                   .reduce((s, t) => s + Math.abs(t.amount), 0)
@@ -654,7 +677,7 @@ export default function ExpenseApp() {
                 style={{
                   fontWeight: 700,
                   color:
-                    total >= 0 ? theme.color.incomeText : theme.color.danger,
+                    total >= 0 ? theme.color.incomeText : "#ffffff",
                 }}
               >
                 {total.toLocaleString("nb-NO")} kr
@@ -869,7 +892,7 @@ export default function ExpenseApp() {
                   <strong
                     style={{
                       fontSize: 17,
-                      color: t.amount < 0 ? "#dc2626" : "#16a34a",
+                      color: t.amount < 0 ? "#ffffff" : "#16a34a",
                       letterSpacing: "-0.3px",
                     }}
                   >
